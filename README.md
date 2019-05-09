@@ -1,1 +1,1 @@
-# Golf-Become-Human
+# GolfPrototype
