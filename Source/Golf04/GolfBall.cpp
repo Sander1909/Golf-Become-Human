@@ -2142,10 +2142,10 @@ void AGolfBall::displayDialogue()
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level01", ESearchCase::IgnoreCase) == 0)
 	{
 		dialogue.Add("W e l c o m e   t o   t h e   t r i a l s");
-		dialogue.Add("T o   b e   v i c t o r i o u s   y o u   m u s t   r e a c h   t h e   R E D   F L A G   o f   e v e r y   c o u r s e");
-		dialogue.Add("H o l d   t h e   L E F T   M O U S E   B U T T O N   a n d   r e l e a s e   t o   s h o o t");
-		dialogue.Add("O r   c l i c k   t h e   R I G H T   M O U S E   B U T T O N   t o   s t a y   s t i l l   a n d   c h i l l");
-		dialogue.Add("W a n t   t o   g e t   y o u r   r e g u l a r   o l d   b o d y   b a c k ?   C h o p    c h o p");
+		dialogue.Add("T o   b e   v i c t o r i o u s   y o u   m u s t\nr e a c h   t h e   R E D   F L A G   o f\ne v e r y   c o u r s e");
+		dialogue.Add("H o l d   t h e   L E F T   M O U S E\nB U T T O N   a n d   r e l e a s e   t o\ns h o o t");
+		dialogue.Add("O r   c l i c k   t h e   R I G H T   M O U S E   B U T T O N   t o   s t a y   s t i l l   a n d\nc h i l l");
+		dialogue.Add("W a n t   t o   g e t   y o u r   r e g u l a r\no l d   b o d y   b a c k ?   C h o p    c h o p");
 		printDialogue(dialogue);
 		playGolfTutorial();
 	}
@@ -2153,16 +2153,16 @@ void AGolfBall::displayDialogue()
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level02", ESearchCase::IgnoreCase) == 0)
 	{
 		dialogue.Add("I t   i s   i m p o r t a n t   t o   c o n s i d e r   d i f f e r e n t   p e r s p e c t i v e s");
-		dialogue.Add("T r y   r o l l i n g   t h e   W H E E L   o n   t h e   M O U S E   a n d   s e e   w h a t   i t   i s   l i k e");
+		dialogue.Add("T r y   r o l l i n g   t h e   W H E E L   o n\nt h e   M O U S E   a n d   s e e   w h a t   i t\ni s   l i k e");
 		printDialogue(dialogue);
 		playZoomTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level03", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("I f   y o u   f i n d   y o u r s e l f   i n  \n t i m e s   o f   t r o u b l e ");
+		dialogue.Add("I f   y o u   f i n d   y o u r s e l f   i n\nt i m e s   o f   t r o u b l e ");
 		dialogue.Add("P r e s s   R   t o   s t a r t   o v e r");
-		dialogue.Add("A l s o ,  w a t c h   o u t   f o r   t h e   w a t e r");
+		dialogue.Add("A l s o ,  w a t c h   o u t   f o r   t h e\nw a t e r");
 		printDialogue(dialogue);
 	}
 
@@ -2174,9 +2174,9 @@ void AGolfBall::displayDialogue()
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level04", ESearchCase::IgnoreCase) == 0 && state == CLIMBING)
 	{
-		dialogue.Add("F i g u r e d   a   p a i r   o f   a r m s   w o u l d   b e   u s e f u l   h e r e");
+		dialogue.Add("F i g u r e d   a   p a i r   o f   a r m s\nw o u l d   b e   u s e f u l   h e r e");
 		dialogue.Add("W h y  d o n ' t   y o u   t r y   t h e s e   o n");
-		dialogue.Add("T r y   t o   C L I C K ,   D R A G   a n d   R E L E A S E   t o   g i v e   y o u r s e l f   a   g o o d   s l i n g i n g");
+		dialogue.Add("T r y   t o   C L I C K ,   D R A G   a n d\nR E L E A S E   t o   g i v e   y o u r s e l f\na   g o o d   s l i n g i n g");
 		printDialogue(dialogue);
 		playClimbTutorial();
 	}
@@ -2190,7 +2190,7 @@ void AGolfBall::displayDialogue()
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level05", ESearchCase::IgnoreCase) == 0 && state == WALKING)
 	{
-		dialogue.Add("I   m i g h t   h a v e   m i x e d   y o u r   l e g s   w i t h   a   t o d d l e r s ,   b u t   y o u   w i l l   m a n a g e");
+		dialogue.Add("I   m i g h t   h a v e   m i x e d   y o u r\nl e g s   w i t h   a   t o d d l e r s ,   b u t\ny o u   w i l l   m a n a g e");
 		dialogue.Add("U s e   W  A  S  D   a n d   S P A C E B A R   t o   w a d d l e   a n d   j u m p");
 		printDialogue(dialogue);
 		playWalkTutorial();
@@ -2198,18 +2198,18 @@ void AGolfBall::displayDialogue()
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level05", ESearchCase::IgnoreCase) == 0 && state == FLYING)
 	{
-		dialogue.Add("I   g o t   t h i s   i d e a   f r o m   a   f r i e n d");
+		dialogue.Add("I   g o t   t h i s   i d e a   f r o m   a\nf r i e n d");
 		dialogue.Add("B i g   f a n   o f   m o b i l e   g a m e s");
-		dialogue.Add("H e   w o u l d n ' t   d o   m u c h   e l s e   a f t e r   t h e   t a n n i n g   i n c i d e n t");
+		dialogue.Add("H e   w o u l d n ' t   d o   m u c h   e l s e\na f t e r   t h e   t a n n i n g\ni n c i d e n t");
 		dialogue.Add("Y o u ' l l   b e   a   m y t h   j u s t   l i k e   m y   f r i e n d   i n   n o   t i m e");
-		dialogue.Add("S o   r e m e m b e r ,   h i t   S P A C E B A R   t o   f l y");
+		dialogue.Add("S o   r e m e m b e r ,   h i t\nS P A C E B A R   t o   f l y");
 		printDialogue(dialogue);
 		playFlyTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level06", ESearchCase::IgnoreCase) == 0 && state == GOLF)
 	{
-		dialogue.Add("Y o u   k n o w ,  I   u s e d   t o   b e   a   s k a t e b o a r d e r");
+		dialogue.Add("Y o u   k n o w ,  I   u s e d   t o   b e   a\ns k a t e b o a r d e r");
 		dialogue.Add("N o w   p e o p l e   m a k e   f u n   o f   m e   o n   t w i t t e r");
 		printDialogue(dialogue);
 	}
@@ -2225,7 +2225,7 @@ void AGolfBall::displayDialogue()
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level07", ESearchCase::IgnoreCase) == 0 && state == FLYING)
 	{
-		dialogue.Add("T h e   f i n a l   g o a l   i s   o n   t h e   o t h e r   s i d e");
+		dialogue.Add("T h e   f i n a l   g o a l   i s   o n   t h e\no t h e r   s i d e");
 		dialogue.Add("I   h a v e   o n e   l a s t   t r i c k   u p   m y   s l e e v e");
 		printDialogue(dialogue);
 	}
@@ -2241,7 +2241,7 @@ void AGolfBall::displayDialogue()
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel02", ESearchCase::IgnoreCase) == 0)
 	{
 		dialogue.Add("P l i n k o   t i m e ,   a   t r u e   t e s t   o f   s k i l l");
-		dialogue.Add("P r e s s   S P A C E B A R   a n d   w i n   s o m e   r e a l *   m o n e y");
+		dialogue.Add("P r e s s   S P A C E B A R   a n d   w i n\ns o m e   r e a l *   m o n e y");
 		printDialogue(dialogue);
 		playFlyTutorial();
 	}
@@ -2256,8 +2256,8 @@ void AGolfBall::displayDialogue()
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel05", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("T i m e   t o   r u n ,  i t   i s   g o o d   f o r   t h e   h e a r t");
-		dialogue.Add("G o l f   b a l l s   h a v e   h e a r t s   r i g h t ?");
+		dialogue.Add("T i m e   t o   r u n ,  i t   i s   g o o d   f o r\nt h e   h e a r t");
+		dialogue.Add("G o l f   b a l l s   h a v e   h e a r t s\nr i g h t ?");
 		printDialogue(dialogue);
 		playWalkTutorial();
 	}
