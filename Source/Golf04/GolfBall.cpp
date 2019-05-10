@@ -145,7 +145,7 @@ void AGolfBall::BeginPlay()
 	else
 		UE_LOG(LogTemp, Warning, TEXT("SkipCameraPanWidget not initialized"));
 	
-	if (FlyingScoreWidget_BP)
+	/*if (FlyingScoreWidget_BP)
 	{
 		FlyingScoreWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), FlyingScoreWidget_BP);
 
@@ -196,6 +196,7 @@ void AGolfBall::BeginPlay()
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("GolfStrokesWidget not initialized"));
+		*/
 
 	walkMaxDuration = 30.f;
 	world = GetWorld();
@@ -1008,13 +1009,13 @@ void AGolfBall::golfInit(bool playTransformParticles)
 		mMesh->SetPhysicsLinearVelocity(ballVelocity, false);
 		mWorldSettings->GlobalGravityZ = -8000.f;
 
-		if (strokeCounter > 0)
-		{
-			GolfStrokesWidget->SetVisibility(ESlateVisibility::Visible);
-			WalkingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
-			FlyingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
-			ClimbingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
+		//if (strokeCounter > 0)
+		//{
+			//GolfStrokesWidget->SetVisibility(ESlateVisibility::Visible);
+			//WalkingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
+			//FlyingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
+			//ClimbingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
+		//}
 	}
 	if (state == WALKING && mMesh && mMesh->IsValidLowLevel())
 	{
@@ -1032,13 +1033,13 @@ void AGolfBall::golfInit(bool playTransformParticles)
 
 		mWorldSettings->GlobalGravityZ = -8000.f;
 
-		if (walkingRestarts > 0)
+		/*if (walkingRestarts > 0)
 		{
 			GolfStrokesWidget->SetVisibility(ESlateVisibility::Hidden);
 			WalkingScoreWidget->SetVisibility(ESlateVisibility::Visible);
 			FlyingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
 			ClimbingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
+		}*/
 	}
 
 	setMeshVisibility();
@@ -1088,13 +1089,13 @@ void AGolfBall::climbingInit(AActor* OtherActor, bool playTransformParticles)
 	setMeshVisibility();
 	switchDecalVisibility(false);
 
-	if (climbingRestarts > 0)
+	/*if (climbingRestarts > 0)
 	{
 		GolfStrokesWidget->SetVisibility(ESlateVisibility::Hidden);
 		WalkingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
 		FlyingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
 		ClimbingScoreWidget->SetVisibility(ESlateVisibility::Visible);
-	}
+	}*/
 }
 
 void AGolfBall::flyingInit(AActor *OtherActor, bool playTransformParticles)
@@ -1122,13 +1123,13 @@ void AGolfBall::flyingInit(AActor *OtherActor, bool playTransformParticles)
 	setMeshVisibility();
 	switchDecalVisibility(false);
 
-	if (flyingRestarts > 0)
+	/*if (flyingRestarts > 0)
 	{
 		GolfStrokesWidget->SetVisibility(ESlateVisibility::Hidden);
 		WalkingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
 		FlyingScoreWidget->SetVisibility(ESlateVisibility::Visible);
 		ClimbingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
+	}*/
 
 }
 
@@ -1518,6 +1519,7 @@ void AGolfBall::setLMBReleased()
 
 					mMesh->SetSimulatePhysics(true);
 					mMesh->AddImpulse(mousePositionReleased * 2750.f, NAME_None, false);
+					UGameplayStatics::PlaySound2D(this, jumpSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.5f);
 
 					stretchRatio = 0.f;
 					debugMouseLine = FVector::ZeroVector;
@@ -2139,108 +2141,123 @@ void AGolfBall::displayDialogue()
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level01", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("What a cute golfball. Welcome to the trials! To be victorious you must reach the RED FLAG of every course.");
-		dialogue.Add("Hold the left mouse button and release to shoot, or click the right button to stay still and chill, if that's what you're about.");
-		dialogue.Add("You can stay forever if you want, but I think we would both rather you WIN and get your regular old body back, right? Chop chop!");
+		dialogue.Add("W e l c o m e   t o   t h e   t r i a l s");
+		dialogue.Add("T o   b e   v i c t o r i o u s   y o u   m u s t   r e a c h   t h e   R E D   F L A G   o f   e v e r y   c o u r s e");
+		dialogue.Add("H o l d   t h e   L E F T   M O U S E   B U T T O N   a n d   r e l e a s e   t o   s h o o t");
+		dialogue.Add("O r   c l i c k   t h e   R I G H T   M O U S E   B U T T O N   t o   s t a y   s t i l l   a n d   c h i l l");
+		dialogue.Add("W a n t   t o   g e t   y o u r   r e g u l a r   o l d   b o d y   b a c k ?   C h o p    c h o p");
 		printDialogue(dialogue);
 		playGolfTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level02", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("It is important to view different perspectives in life. Try rolling the WHEEL on the MOUSE and see what it's like!");
+		dialogue.Add("I t   i s   i m p o r t a n t   t o   c o n s i d e r   d i f f e r e n t   p e r s p e c t i v e s");
+		dialogue.Add("T r y   r o l l i n g   t h e   W H E E L   o n   t h e   M O U S E   a n d   s e e   w h a t   i t   i s   l i k e");
 		printDialogue(dialogue);
 		playZoomTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level03", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("Some intro dialogue for level 3");
-		dialogue.Add("Golf time :)");
+		dialogue.Add("I f   y o u   f i n d   y o u r s e l f   i n  \n t i m e s   o f   t r o u b l e ");
+		dialogue.Add("P r e s s   R   t o   s t a r t   o v e r");
+		dialogue.Add("A l s o ,  w a t c h   o u t   f o r   t h e   w a t e r");
 		printDialogue(dialogue);
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level04", ESearchCase::IgnoreCase) == 0 && state == GOLF)
 	{
-		dialogue.Add("Some intro dialogue for level 4");
-		dialogue.Add("Golf time :)");
+		dialogue.Add("B e h o l d,   t r i a n g l e s");
 		printDialogue(dialogue);
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level04", ESearchCase::IgnoreCase) == 0 && state == CLIMBING)
 	{
-		dialogue.Add("Figured a pair of arms would be useful here. Why don't you try these on?");
-		dialogue.Add("Try to CLICK, DRAG and RELEASE to give that ball a good slinging.");
+		dialogue.Add("F i g u r e d   a   p a i r   o f   a r m s   w o u l d   b e   u s e f u l   h e r e");
+		dialogue.Add("W h y  d o n ' t   y o u   t r y   t h e s e   o n");
+		dialogue.Add("T r y   t o   C L I C K ,   D R A G   a n d   R E L E A S E   t o   g i v e   y o u r s e l f   a   g o o d   s l i n g i n g");
 		printDialogue(dialogue);
 		playClimbTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level05", ESearchCase::IgnoreCase) == 0 && state == GOLF)
 	{
-		dialogue.Add("Some intro dialogue for level 5");
-		dialogue.Add("Golf time :)");
+		dialogue.Add("P l e a s e   u s e   t h e   l o o p");
+		dialogue.Add("I   b e g   y o u");
 		printDialogue(dialogue);
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level05", ESearchCase::IgnoreCase) == 0 && state == WALKING)
 	{
-		dialogue.Add("Nice legs. I might have mixed your legs with a toddlers, but you'll manage. I believe in you.");
-		dialogue.Add("The legs respond to W A S D and SPACEBAR to waddle around and jump. You didn't use limbs for a while, so play around some.");
+		dialogue.Add("I   m i g h t   h a v e   m i x e d   y o u r   l e g s   w i t h   a   t o d d l e r s ,   b u t   y o u   w i l l   m a n a g e");
+		dialogue.Add("U s e   W  A  S  D   a n d   S P A C E B A R   t o   w a d d l e   a n d   j u m p");
 		printDialogue(dialogue);
 		playWalkTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level05", ESearchCase::IgnoreCase) == 0 && state == FLYING)
 	{
-		dialogue.Add("I got this idea from a friend. Big fan of mobile games. He wouldn't do much else after the tanning incident.");
-		dialogue.Add("Wings are tricky to handle. Hit SPACEBAR to fly. You'll be a myth just like my friend in no time!");
+		dialogue.Add("I   g o t   t h i s   i d e a   f r o m   a   f r i e n d");
+		dialogue.Add("B i g   f a n   o f   m o b i l e   g a m e s");
+		dialogue.Add("H e   w o u l d n ' t   d o   m u c h   e l s e   a f t e r   t h e   t a n n i n g   i n c i d e n t");
+		dialogue.Add("Y o u ' l l   b e   a   m y t h   j u s t   l i k e   m y   f r i e n d   i n   n o   t i m e");
+		dialogue.Add("S o   r e m e m b e r ,   h i t   S P A C E B A R   t o   f l y");
 		printDialogue(dialogue);
 		playFlyTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level06", ESearchCase::IgnoreCase) == 0 && state == GOLF)
 	{
-		dialogue.Add("You're doing pretty good, kid. Let's see how you handle this.");
+		dialogue.Add("Y o u   k n o w ,  I   u s e d   t o   b e   a   s k a t e b o a r d e r");
+		dialogue.Add("N o w   p e o p l e   m a k e   f u n   o f   m e   o n   t w i t t e r");
 		printDialogue(dialogue);
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level07", ESearchCase::IgnoreCase) == 0 && state == GOLF)
 	{
-		dialogue.Add("Okayokayokay. You're just going to go ahead and complete the entire trial like that, huh?");
-		dialogue.Add("This is it. Pull this trial off and you will stand above all the noobs that never made it all the way. Don't let me down.");
+		dialogue.Add("A r r o w   t o   t h e   k n e e");
+		dialogue.Add("A l s o ,  t h e  c a k e  i s  a  l i e");
+		dialogue.Add("P o k e m o n   G O   t o  t h e  p o l l s");
+		dialogue.Add("I  a m   a   r e l a t a b l e   g o d");
 		printDialogue(dialogue);
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level07", ESearchCase::IgnoreCase) == 0 && state == FLYING)
 	{
-		dialogue.Add("The final goal is on the other side, but it's not over yet. I've left another suprise for you.");
+		dialogue.Add("T h e   f i n a l   g o a l   i s   o n   t h e   o t h e r   s i d e");
+		dialogue.Add("I   h a v e   o n e   l a s t   t r i c k   u p   m y   s l e e v e");
 		printDialogue(dialogue);
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel01", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("Bowling time :)");
+		dialogue.Add("T h i s   g a m e   i s   a   l o t   l i k e   g o l f");
+		dialogue.Add("B u t   m o r e   v i o l e n t");
 		printDialogue(dialogue);
 		playGolfTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel02", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("Plinko time :)");
+		dialogue.Add("P l i n k o   t i m e ,   a   t r u e   t e s t   o f   s k i l l");
+		dialogue.Add("P r e s s   S P A C E B A R   a n d   w i n   s o m e   r e a l *   m o n e y");
 		printDialogue(dialogue);
 		playFlyTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel04", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("Pacman time :)");
+		dialogue.Add("M y   t r i a l s   a r e   i n f r i n g i n g   o n   i n t e l l e c t u a l   p r o p e r t y ?");
+		dialogue.Add("T h i s   i s   G o l f - m a n ,  n o w   p r e s s   W A S D   o r   s o m e t h i n g");
 		printDialogue(dialogue);
 		playPacmanTutorial();
 	}
 
 	if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel05", ESearchCase::IgnoreCase) == 0)
 	{
-		dialogue.Add("Running time :)");
+		dialogue.Add("T i m e   t o   r u n ,  i t   i s   g o o d   f o r   t h e   h e a r t");
+		dialogue.Add("G o l f   b a l l s   h a v e   h e a r t s   r i g h t ?");
 		printDialogue(dialogue);
 		playWalkTutorial();
 	}

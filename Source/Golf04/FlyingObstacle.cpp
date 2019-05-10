@@ -69,11 +69,22 @@ void AFlyingObstacle::OnOverlap(UPrimitiveComponent * OverlappedComponent, AActo
 	{
 		if (!Cast<AGolfBall>(OtherActor)->bRespawning)
 		{
-			static_cast<AGolfBall*>(OtherActor)->state = static_cast<AGolfBall*>(OtherActor)->states::WALKING;
-			static_cast<AGolfBall*>(OtherActor)->golfInit();
-			static_cast<AGolfBall*>(OtherActor)->respawnAtCheckpoint();
-			Cast<AGolfBall>(OtherActor)->FlyingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
-			Cast<AGolfBall>(OtherActor)->flyingRestarts++;
+			if (UGameplayStatics::GetCurrentLevelName(this).Compare("Level06", ESearchCase::IgnoreCase) != 0)
+			{
+				static_cast<AGolfBall*>(OtherActor)->state = static_cast<AGolfBall*>(OtherActor)->states::WALKING;
+				static_cast<AGolfBall*>(OtherActor)->golfInit();
+				static_cast<AGolfBall*>(OtherActor)->respawnAtCheckpoint();
+				//Cast<AGolfBall>(OtherActor)->FlyingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
+				//Cast<AGolfBall>(OtherActor)->flyingRestarts++;
+			}
+			else
+			{
+				static_cast<AGolfBall*>(OtherActor)->state = static_cast<AGolfBall*>(OtherActor)->states::GOLF;
+				static_cast<AGolfBall*>(OtherActor)->golfInit();
+				static_cast<AGolfBall*>(OtherActor)->respawnAtCheckpoint();
+				//Cast<AGolfBall>(OtherActor)->FlyingScoreWidget->SetVisibility(ESlateVisibility::Hidden);
+				//Cast<AGolfBall>(OtherActor)->flyingRestarts++;
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Components/BoxComponent.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"

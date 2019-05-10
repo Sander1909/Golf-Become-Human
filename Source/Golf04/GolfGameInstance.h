@@ -40,10 +40,10 @@ public:
 		int gameInstanceStrokeCounter = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float musicVolume = 1.f;
+		float musicVolume = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float soundEffectVolume = 1.f;
+		float soundEffectVolume = 0.75f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int previousState;
