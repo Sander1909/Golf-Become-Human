@@ -869,17 +869,17 @@ void AGolfBall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	InputComponent->BindAction("D", IE_Released, this, &AGolfBall::DReleased);
 	InputComponent->BindAction("ScrollUp", IE_Pressed, this, &AGolfBall::scrollUp);
 	InputComponent->BindAction("ScrollDown", IE_Pressed, this, &AGolfBall::scrollDown);
-	InputComponent->BindAction("L", IE_Pressed, this, &AGolfBall::displayDialogue);
+	//InputComponent->BindAction("L", IE_Pressed, this, &AGolfBall::displayDialogue);
 	InputComponent->BindAction("R", IE_Pressed, this, &AGolfBall::respawnAtCheckpoint);
-	InputComponent->BindAction("Y", IE_Pressed, this, &AGolfBall::confirmLevelSelection);
-	InputComponent->BindAction("P", IE_Pressed, this, &AGolfBall::pauseGame);
+	//InputComponent->BindAction("Y", IE_Pressed, this, &AGolfBall::confirmLevelSelection);
+	//InputComponent->BindAction("P", IE_Pressed, this, &AGolfBall::pauseGame);
 	InputComponent->BindAction("Enter", IE_Pressed, this, &AGolfBall::enterPressed);
 
 	InputComponent->BindAction("Left Mouse Button", IE_Pressed, this, &AGolfBall::setLMBPressed);
 	InputComponent->BindAction("Left Mouse Button", IE_Released, this, &AGolfBall::setLMBReleased);
 	InputComponent->BindAction("Right Mouse Button", IE_Pressed, this, &AGolfBall::stopStrike);
 
-	InputComponent->BindAction("1", IE_Pressed, this, &AGolfBall::openLevelOne);
+	/*InputComponent->BindAction("1", IE_Pressed, this, &AGolfBall::openLevelOne);
 	InputComponent->BindAction("2", IE_Pressed, this, &AGolfBall::openLevelTwo);
 	InputComponent->BindAction("3", IE_Pressed, this, &AGolfBall::openLevelThree);
 	InputComponent->BindAction("4", IE_Pressed, this, &AGolfBall::openLevelFour);
@@ -887,7 +887,10 @@ void AGolfBall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	InputComponent->BindAction("6", IE_Pressed, this, &AGolfBall::openLevelSix);
 	InputComponent->BindAction("7", IE_Pressed, this, &AGolfBall::openLevelSeven);
 	InputComponent->BindAction("8", IE_Pressed, this, &AGolfBall::openLevelEight);
-	InputComponent->BindAction("9", IE_Pressed, this, &AGolfBall::openLevelNine);
+	InputComponent->BindAction("9", IE_Pressed, this, &AGolfBall::openLevelNine);*/
+
+	InputComponent->BindAction("Escape", IE_Pressed, this, &AGolfBall::pauseGame);
+
 
 }
 
@@ -1444,7 +1447,9 @@ void AGolfBall::setLMBReleased()
 			mMesh->SetLinearDamping(0.6);
 			mMesh->SetAngularDamping(0.1);
 
-			if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel03", ESearchCase::IgnoreCase) != 0)
+			if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel03", ESearchCase::IgnoreCase) != 0
+				&& UGameplayStatics::GetCurrentLevelName(this).Compare("Intro", ESearchCase::IgnoreCase) != 0
+				&& UGameplayStatics::GetCurrentLevelName(this).Compare("Outro", ESearchCase::IgnoreCase) != 0)
 			{
 
 				if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel01", ESearchCase::IgnoreCase) == 0 && !secretLevelManagerInstance->bBallIsThrown)
