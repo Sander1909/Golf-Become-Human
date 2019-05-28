@@ -32,19 +32,19 @@ UGolfSaveGame::UGolfSaveGame()
 	levelData[3].golfPar.Add(8);
 
 	levelData[4].levelName = TEXT("Level05");
-	levelData[4].golfPar.Add(10);
-	levelData[4].golfPar.Add(11);
-	levelData[4].golfPar.Add(12);
+	levelData[4].golfPar.Add(4);
+	levelData[4].golfPar.Add(5);
+	levelData[4].golfPar.Add(6);
 
 	levelData[5].levelName = TEXT("Level06");
-	levelData[5].golfPar.Add(10);
-	levelData[5].golfPar.Add(11);
-	levelData[5].golfPar.Add(12);
+	levelData[5].golfPar.Add(25);
+	levelData[5].golfPar.Add(35);
+	levelData[5].golfPar.Add(50);
 
 	levelData[6].levelName = TEXT("Level07");
-	levelData[6].golfPar.Add(10);
-	levelData[6].golfPar.Add(11);
 	levelData[6].golfPar.Add(12);
+	levelData[6].golfPar.Add(15);
+	levelData[6].golfPar.Add(17);
 
 	//Secret levels
 	levelData[7].levelName = TEXT("SecretLevel01");

@@ -50,4 +50,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int currentSong = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool gamepadConnected = true;
 };

@@ -506,9 +506,17 @@ void AGolfBall::Tick(float DeltaTime)
 		if(bLerpingPerspective)
 			lerpPerspective(FRotator(-30.f, 0.f, 0.f), mSpringArm->TargetArmLength, FRotator(10.f, 0.f, 0.f), DeltaTime);
 
+		if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+		{
+			gamepadCameraPitch();
+			gamepadCameraYaw();
+		}
+		else
+		{
 			mouseCameraPitch();
 			mouseCameraYaw();
-
+		}
+			
 		if (currentLaunchPower > maxLaunchPower)
 			currentLaunchPower = maxLaunchPower;
 
@@ -594,10 +602,21 @@ void AGolfBall::Tick(float DeltaTime)
 
 		lineTraceHit = lineTrace();
 
-		mouseCameraPitch();
-		mouseCameraYaw();
+		if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+		{
+			gamepadCameraPitch();
+			gamepadCameraYaw();
+		}
+		else
+		{
+			mouseCameraPitch();
+			mouseCameraYaw();
+		}
 
-		tickWalking(DeltaTime);
+		if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+			tickWalkingGamepad(DeltaTime);
+		else
+			tickWalking(DeltaTime);
 
 		if (onGround && mMesh->GetLinearDamping() < 19.f)// && !onMoveablePlatform)
 			mMesh->SetLinearDamping(20.f);
@@ -794,8 +813,16 @@ void AGolfBall::Tick(float DeltaTime)
 		if(bLerpingPerspective)
 			lerpPerspective(FRotator(-30, 0.f, 0.f), mSpringArm->TargetArmLength, FRotator(10.f, 0.f, 0.f), DeltaTime);
 		mMesh->SetLinearDamping(100.f);
-		mouseCameraPitch();
-		mouseCameraYaw();
+		if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+		{
+			gamepadCameraPitch();
+			gamepadCameraYaw();
+		}
+		else
+		{
+			mouseCameraPitch();
+			mouseCameraYaw();
+		}
 		tickWalking(DeltaTime);
 		break;
 
@@ -842,12 +869,15 @@ void AGolfBall::Tick(float DeltaTime)
 	if (bCameraShouldPan)
 		cameraPanTick(DeltaTime);
 
+
 	
 	/*if (Cast<UGolfGameInstance>(GetGameInstance()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *Cast<UGolfGameInstance>(GetGameInstance())->secretLevelEntrancePosition.ToString());
 		UE_LOG(LogTemp, Warning, TEXT("%s"), Cast<UGolfGameInstance>(GetGameInstance())->exitingSecretLevel ? TEXT("true") : TEXT("false"));
 	}*/
+
+	UE_LOG(LogTemp, Warning, TEXT("X = %f , Y = %f"), rightThumbX, rightThumbY);
 }
 
 
@@ -878,20 +908,20 @@ void AGolfBall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	InputComponent->BindAction("Left Mouse Button", IE_Pressed, this, &AGolfBall::setLMBPressed);
 	InputComponent->BindAction("Left Mouse Button", IE_Released, this, &AGolfBall::setLMBReleased);
 	InputComponent->BindAction("Right Mouse Button", IE_Pressed, this, &AGolfBall::stopStrike);
-
-	/*InputComponent->BindAction("1", IE_Pressed, this, &AGolfBall::openLevelOne);
-	InputComponent->BindAction("2", IE_Pressed, this, &AGolfBall::openLevelTwo);
-	InputComponent->BindAction("3", IE_Pressed, this, &AGolfBall::openLevelThree);
-	InputComponent->BindAction("4", IE_Pressed, this, &AGolfBall::openLevelFour);
-	InputComponent->BindAction("5", IE_Pressed, this, &AGolfBall::openLevelFive);
-	InputComponent->BindAction("6", IE_Pressed, this, &AGolfBall::openLevelSix);
-	InputComponent->BindAction("7", IE_Pressed, this, &AGolfBall::openLevelSeven);
-	InputComponent->BindAction("8", IE_Pressed, this, &AGolfBall::openLevelEight);
-	InputComponent->BindAction("9", IE_Pressed, this, &AGolfBall::openLevelNine);*/
-
 	InputComponent->BindAction("Escape", IE_Pressed, this, &AGolfBall::pauseGame);
 
 
+	//Gamepad input
+	InputComponent->BindAction("Gamepad Face Button Bottom", IE_Pressed, this, &AGolfBall::GamepadFaceButtonBottomPressed);
+	InputComponent->BindAction("Gamepad Face Button Bottom", IE_Released, this, &AGolfBall::GamepadFaceButtonBottomReleased);
+	
+	InputComponent->BindAxis("LeftThumbY", this, &AGolfBall::LeftThumbY);
+	InputComponent->BindAxis("LeftThumbX", this, &AGolfBall::LeftThumbX);
+
+	InputComponent->BindAxis("RightThumbY", this, &AGolfBall::RightThumbY);
+	InputComponent->BindAxis("RightThumbX", this, &AGolfBall::RightThumbX);
+
+	//InputComponent->BindAxis("RightThumbX", this, &AGolfBall::)
 }
 
 void AGolfBall::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor *OtherActor,
@@ -1277,6 +1307,59 @@ void AGolfBall::WClicked()
 	}
 }
 
+void AGolfBall::LeftThumbY(float AxisValue)
+{
+	UE_LOG(LogTemp, Warning, TEXT("up value: %f"), AxisValue);
+	if (AxisValue > 0.1f)
+	{
+		leftThumbUp = true;
+		movementSpeedV2.Y = AxisValue;
+	}
+	else
+	{
+		leftThumbUp = false;
+		movementSpeedV2.Y = AxisValue;
+	}
+
+
+	if (AxisValue < -0.1f)
+	{
+		leftThumbDown = true;
+		movementSpeedV2.Y = AxisValue;
+	}
+	else
+	{
+		leftThumbDown = false;
+		movementSpeedV2.Y = AxisValue;
+	}
+}
+
+void AGolfBall::LeftThumbX(float AxisValue)
+{
+	UE_LOG(LogTemp, Warning, TEXT("right value: %f"), AxisValue);
+	if (AxisValue > 0.1f)
+	{
+		leftThumbRight = true;
+		movementSpeedV2.X = AxisValue;
+	}
+	else
+	{
+		leftThumbRight = false;
+		movementSpeedV2.X = AxisValue;
+	}
+		
+	if (AxisValue < -0.1f)
+	{
+		leftThumbLeft = true;
+		movementSpeedV2.X = AxisValue;
+	}
+	else
+	{
+		leftThumbLeft = false;
+		movementSpeedV2.X = AxisValue;
+	}
+}
+
 void AGolfBall::WReleased()
 {
 	if (!bCameraShouldPan)
@@ -1342,8 +1425,6 @@ void AGolfBall::SReleased()
 {
 	if (!bCameraShouldPan)
 	{
-
-
 		SPressed = false;
 
 		if (secretLevelManagerInstance && secretLevelManagerInstance->secretState == SecretLevelState::MAZE)
@@ -1444,8 +1525,11 @@ void AGolfBall::setLMBReleased()
 				indicatorStretch = 0.f;
 				dirIndicator->Destroy();
 			}
-			mMesh->SetLinearDamping(0.6);
-			mMesh->SetAngularDamping(0.1);
+			if (mMesh)
+			{
+				mMesh->SetLinearDamping(0.6);
+				mMesh->SetAngularDamping(0.1);
+			}
 
 			if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel03", ESearchCase::IgnoreCase) != 0
 				&& UGameplayStatics::GetCurrentLevelName(this).Compare("Intro", ESearchCase::IgnoreCase) != 0
@@ -1473,9 +1557,15 @@ void AGolfBall::setLMBReleased()
 					UGameplayStatics::PlaySound2D(this, golfHitSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.f);
 					Cast<UGolfGameInstance>(GetGameInstance())->gameInstanceStrokeCounter++;
 				}
+				else if (!canLaunch)
+				{
+					if (dirIndicator)
+						dirIndicator->Destroy();
+					currentLaunchPower = 0.f;
+				}
 					
 			}
-			else
+			else if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel03", ESearchCase::IgnoreCase) == 0)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Ball launched (billiards)"));
 				mMesh->AddImpulse(billiardsLaunchDirection * currentLaunchPower * 350.f, NAME_None, false);
@@ -1484,8 +1574,8 @@ void AGolfBall::setLMBReleased()
 			}
 			currentLaunchPower = 0.f;
 
-			if (PowerBarWidget)
-				PowerBarWidget->SetVisibility(ESlateVisibility::Hidden);
+			//if (PowerBarWidget)
+				//PowerBarWidget->SetVisibility(ESlateVisibility::Hidden);
 
 			break;
 		case WALKING:
@@ -1542,6 +1632,61 @@ void AGolfBall::setLMBReleased()
 		}
 	}
 }
+
+void AGolfBall::GamepadFaceButtonBottomPressed()
+{
+	if (!bCameraShouldPan)
+	{
+		if (state == FLYING)
+		{
+			if (hoverInAir)
+			{
+				hoverInAir = false;
+			}
+
+			if (!hoverInAir)
+			{
+				velocity = FVector::ZeroVector;
+
+				if (!easeGravityShift)
+				{
+					//if (!flyingGravityFlipped)
+					UGameplayStatics::PlaySound2D(this, jumpSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 0.01f);
+					applyForce(FVector(0, 0, 30));
+					//else
+					//applyForce(FVector(0, 0, -30));
+
+					bRestartFlyingAnim = true;
+				}
+				else
+					bRestartFlyingAnim = true;
+			}
+
+		}
+		if (state == WALKING && lineTraceHit && !jumpingNotReady)
+		{
+			jump();
+			jumpingNotReady = true;
+		}
+
+		if (state == WALKING && !lineTraceHit && coyoteJumpAvailable)
+		{
+			jump();
+			jumpingNotReady = true;
+		}
+
+		if (state == PLINKO && secretLevelManagerInstance->plinkoLaunchReady)
+		{
+			secretLevelManagerInstance->startChargingPlinko();
+		}
+	}
+
+}
+void AGolfBall::GamepadFaceButtonBottomReleased()
+{
+	if (state == PLINKO)
+		secretLevelManagerInstance->plinkoLaunch();
+}
 void AGolfBall::mouseCameraPitch()
 {
 	if (mouseInputEnabled)
@@ -1558,6 +1703,44 @@ void AGolfBall::mouseCameraYaw()
 		world->GetFirstPlayerController()->GetInputMouseDelta(mouseX, mouseY);
 		world->GetFirstPlayerController()->AddYawInput(mouseX * cameraSpeed);
 	}
+}
+
+void AGolfBall::gamepadCameraPitch()
+{
+	if (mouseInputEnabled)
+	{
+		world->GetFirstPlayerController()->GetInputAnalogStickState(EControllerAnalogStick::CAS_RightStick, rightThumbX, rightThumbY);
+		mCamera->RelativeRotation.Pitch = FMath::Clamp(mCamera->RelativeRotation.Pitch + (rightThumbY * -1 * cameraSpeed * 2), -10.f, 30.f);
+	}
+}
+
+void AGolfBall::gamepadCameraYaw()
+{
+	if (mouseInputEnabled)
+	{
+		world->GetFirstPlayerController()->GetInputAnalogStickState(EControllerAnalogStick::CAS_RightStick, rightThumbX, rightThumbY);
+		world->GetFirstPlayerController()->AddYawInput(rightThumbX * cameraSpeed * 2);
+	}
+}
+
+void AGolfBall::RightThumbX(float AxisValue)
+{
+	/*if (AxisValue > 0.1f)
+		rightThumbX = AxisValue;
+	else if (AxisValue < -0.1f)
+		rightThumbX = AxisValue;
+	else
+		AxisValue = 0;*/
+}
+
+void AGolfBall::RightThumbY(float AxisValue)
+{
+	/*if (AxisValue > 0.1f)
+		rightThumbY = AxisValue;
+	else if (AxisValue < -0.1f)
+		rightThumbY = AxisValue;
+	else
+		AxisValue = 0;*/
 }
 
 void AGolfBall::leftShiftPressed()
@@ -1584,7 +1767,6 @@ void AGolfBall::leftShiftPressed()
 	}
 
 	walkTimer = walkMaxDuration;
-	
 }
 
 void AGolfBall::enterPressed()
@@ -1789,6 +1971,95 @@ void AGolfBall::tickWalking(float DeltaTime)
 
 }
 
+void AGolfBall::tickWalkingGamepad(float DeltaTime)
+{
+	if (lineTraceHit)
+		mMesh->SetWorldRotation(currentRotation);
+
+	bValidInput = true;
+
+	if (leftThumbLeft && leftThumbRight && leftThumbDown && !leftThumbUp)
+		walkingDirection = mController->GetControlRotation().Yaw + 180.f;
+	else if (leftThumbLeft && leftThumbRight && leftThumbUp && !leftThumbDown)
+		walkingDirection = mController->GetControlRotation().Yaw + 0.f;
+	else if (leftThumbDown && leftThumbUp && leftThumbRight && !leftThumbLeft)
+		walkingDirection = mController->GetControlRotation().Yaw + 90.f;
+	else if (leftThumbDown && leftThumbUp && leftThumbLeft && !leftThumbRight)
+		walkingDirection = mController->GetControlRotation().Yaw - 90.f;
+	else if (leftThumbUp && leftThumbLeft && !leftThumbDown && !leftThumbRight)
+		walkingDirection = mController->GetControlRotation().Yaw - 45.f;
+	else if (leftThumbUp && leftThumbRight && !leftThumbLeft && !leftThumbDown)
+		walkingDirection = mController->GetControlRotation().Yaw + 45.f;
+	else if (leftThumbDown && leftThumbLeft && !leftThumbUp && !leftThumbRight)
+		walkingDirection = mController->GetControlRotation().Yaw - 135.f;
+	else if (leftThumbDown && leftThumbRight && !leftThumbUp && !leftThumbLeft)
+		walkingDirection = mController->GetControlRotation().Yaw + 135.f;
+	else if (leftThumbDown && !leftThumbRight && !leftThumbUp && !leftThumbLeft)
+		walkingDirection = mController->GetControlRotation().Yaw + 180.f;
+	else if (leftThumbLeft && !leftThumbRight && !leftThumbUp && !leftThumbDown)
+		walkingDirection = mController->GetControlRotation().Yaw - 90.f;
+	else if (leftThumbRight && !leftThumbDown && !leftThumbUp && !leftThumbLeft)
+		walkingDirection = mController->GetControlRotation().Yaw + 90.f;
+	else if (leftThumbUp && !leftThumbRight && !leftThumbDown && !leftThumbLeft)
+		walkingDirection = mController->GetControlRotation().Yaw + 0.f;
+	else
+		bValidInput = false;
+
+	if (bValidInput)
+	{
+		if (leftThumbUp || leftThumbLeft || leftThumbDown || leftThumbRight)
+		{
+			movementTransformation(DeltaTime);
+		}
+	}
+
+	if (platformJump)
+		platformJump = timerFunction(0.2f, DeltaTime);
+
+	/*if (hitResults.Num() > 0)
+	{
+	if (GEngine && hitResults.Num() > 0)
+	GEngine->AddOnScreenDebugMessage(2, 0.1f, FColor::Red, hitResults[0].GetActor()->GetHumanReadableName());
+
+	}*/
+
+
+	if (onGround)
+	{
+		if (hitResults[0].GetActor()->GetHumanReadableName().Contains("SplinePlatform") ||
+			hitResults[0].GetActor()->GetHumanReadableName().Contains("MoveablePlatform") ||
+			hitResults[0].GetActor()->GetHumanReadableName().Contains("TransformationObject"))
+		{
+
+			//if (GEngine && hitResults.Num() > 0)
+			//Engine->AddOnScreenDebugMessage(2, 0.1f, FColor::Red, hitResults[0].GetActor()->GetHumanReadableName());
+			onPlatform = true;
+
+			//UE_LOG(LogTemp, Warning, TEXT("%s"), *platformOffset.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("%i"), platformOffset.Size());
+
+			if (platformOffset.Size() < 2.f && !platformJump)
+			{
+				platformOffset = GetActorLocation() - hitResults[0].GetActor()->GetActorLocation();
+			}
+			if (platformOffset.Size() > 10.f && !platformJump)
+			{
+				SetActorLocation(hitResults[0].GetActor()->GetActorLocation() + platformOffset, true);
+				//mMesh->SetPhysicsLinearVelocity(FVector(0.f, 0.f, 0.f), false, NAME_None);
+			}
+		}
+	}
+	else
+	{
+		onPlatform = false;
+		platformOffset = FVector::OneVector;
+	}
+
+	//if (GEngine)
+	//GEngine->AddOnScreenDebugMessage(2, 0.1f, FColor::Red, *platformOffset.ToString());
+
+}
+
 void AGolfBall::movementTransformation(float DeltaTime)
 {	
 	//Reusing variables and snapRotation is camera + inputDirection rotation
@@ -1802,9 +2073,19 @@ void AGolfBall::movementTransformation(float DeltaTime)
 	//FTransform used for actor translation
 	newTranslationTransform = FTransform(targetRotation.Vector(), newRightVector, surfaceNormal, impactPoint);
 
-	if(onGround)
-		mMesh->AddForce((newTranslationTransform.Rotator().Vector() * movementSpeed) * DeltaTime, NAME_None, true);
+	if (onGround)
+	{
+		movementSpeedV2.Normalize();
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *movementSpeedV2.ToString());
 
+		if(Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+			mMesh->AddForce((newTranslationTransform.Rotator().Vector() * movementSpeed * movementSpeedV2.Size()) * DeltaTime, NAME_None, true);
+		else
+			mMesh->AddForce((newTranslationTransform.Rotator().Vector() * movementSpeed) * DeltaTime, NAME_None, true);
+
+
+	}
+		
 	FVector XYLength = FVector(mMesh->GetPhysicsLinearVelocity().X, mMesh->GetPhysicsLinearVelocity().Y, 0.f);
 	FVector XYNormalized = XYLength;
 	XYNormalized.Normalize(0.01f);

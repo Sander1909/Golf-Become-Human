@@ -251,6 +251,7 @@ public:
 
 	void walkFunction(float deltaTime);
 	void tickWalking(float DeltaTime);
+	void tickWalkingGamepad(float DeltaTime);	
 	void jump();
 	void applyForce(FVector Force);
 	void updatePosition(float DeltaTime);
@@ -269,8 +270,31 @@ public:
 	void setLMBPressed();
 	void setLMBReleased();
 
+	void LeftThumbY(float AxisValue);
+	void LeftThumbX(float AxisValue);
+
+	FVector2D movementSpeedV2;
+	
+	bool leftThumbUp = false;
+	bool leftThumbDown = false;
+	bool leftThumbLeft = false;
+	bool leftThumbRight = false;
+
+	void GamepadFaceButtonBottomPressed();
+	void GamepadFaceButtonBottomReleased();
+
 	void mouseCameraPitch();
 	void mouseCameraYaw();
+
+	void gamepadCameraPitch();
+	void gamepadCameraYaw();
+
+	float rightThumbX = 0.f;
+	float rightThumbY = 0.f;
+
+	void RightThumbX(float AxisValue);
+	void RightThumbY(float AxisValue);
+
 	float cameraSpeed;
 
 	void leftShiftPressed();

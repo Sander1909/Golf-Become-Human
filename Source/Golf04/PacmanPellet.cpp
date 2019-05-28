@@ -46,8 +46,6 @@ void APacmanPellet::OnBeginOverlap(UPrimitiveComponent * OverlappedComponent,
 	if (OtherActor->IsA(AGolfBall::StaticClass()))
 	{
 		Cast<AGolfBall>(UGameplayStatics::GetPlayerPawn(this, 0))->secretLevelManagerInstance->pacmanScore += 10;
-		//UGameplayStatics::PlaySound2D(this, Cast<AGolfBall>(UGameplayStatics::GetPlayerPawn(this, 0))->pacmanPickupSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1);
-
 		secretLevelManagerInstance->pellets.Remove(this);
 		if (secretLevelManagerInstance->pellets.Num() == 0)
 		{
@@ -57,4 +55,3 @@ void APacmanPellet::OnBeginOverlap(UPrimitiveComponent * OverlappedComponent,
 		Destroy();
 	}
 }
-
