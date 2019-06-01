@@ -52,5 +52,5 @@ public:
 		int currentSong = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool gamepadConnected = true;
+		bool gamepadConnected = false;
 };

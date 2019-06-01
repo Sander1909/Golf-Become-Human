@@ -222,6 +222,8 @@ public:
 	float frameX = 1206.f;
 	float frameY = 572.f;
 
+	FVector2D gamepadMouseLocation;
+
 	//Flying
 	FVector position;
 	FVector velocity;

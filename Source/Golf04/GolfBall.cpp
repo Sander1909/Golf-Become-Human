@@ -456,6 +456,17 @@ void AGolfBall::BeginPlay()
 		}
 	}
 
+	if(Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+	{
+		int tempX, tempY;
+		GetWorld()->GetFirstPlayerController()->GetViewportSize(tempX, tempY);
+		gamepadMouseLocation.X = tempX / 2;
+		gamepadMouseLocation.Y = tempY / 2;
+
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *gamepadMouseLocation.ToString())
+	}
+
+
 	UE_LOG(LogTemp, Warning, TEXT("Golf ball initialized"));
 
 	/*decalShadow = FindComponentByClass<UDecalComponent>();
@@ -1289,7 +1300,11 @@ void AGolfBall::spacebarPressed()
 void AGolfBall::spacebarReleased()
 {
 	if (state == PLINKO)
+	{
+		UGameplayStatics::PlaySound2D(this, golfHitSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.f);
 		secretLevelManagerInstance->plinkoLaunch();
+	}
+
 }
 
 void AGolfBall::WClicked()
@@ -1309,54 +1324,75 @@ void AGolfBall::WClicked()
 
 void AGolfBall::LeftThumbY(float AxisValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("up value: %f"), AxisValue);
-	if (AxisValue > 0.1f)
+	//UE_LOG(LogTemp, Warning, TEXT("up value: %f"), AxisValue);
+	if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
 	{
-		leftThumbUp = true;
-		movementSpeedV2.Y = AxisValue;
-	}
-	else
-	{
-		leftThumbUp = false;
-		movementSpeedV2.Y = AxisValue;
-	}
+		if (AxisValue > 0.1f)
+		{
+			leftThumbUp = true;
+			movementSpeedV2.Y = AxisValue;
+		}
+		else
+		{
+			leftThumbUp = false;
+			movementSpeedV2.Y = AxisValue;
+		}
 
+		if (AxisValue < -0.1f)
+		{
+			leftThumbDown = true;
+			movementSpeedV2.Y = AxisValue;
+		}
+		else
+		{
+			leftThumbDown = false;
+			movementSpeedV2.Y = AxisValue;
+		}
 
-	if (AxisValue < -0.1f)
-	{
-		leftThumbDown = true;
-		movementSpeedV2.Y = AxisValue;
-	}
-	else
-	{
-		leftThumbDown = false;
-		movementSpeedV2.Y = AxisValue;
+		if (GetWorld()->GetFirstPlayerController()->bShowMouseCursor == true)
+		{
+			int tempX, tempY;
+			GetWorld()->GetFirstPlayerController()->GetViewportSize(tempX, tempY);
+			FMath::Clamp((gamepadMouseLocation.Y += AxisValue * 10.f * -1), 0.f, (float)tempY);
+			GetWorld()->GetFirstPlayerController()->SetMouseLocation(gamepadMouseLocation.X, gamepadMouseLocation.Y);
+		}
 	}
 }
 
 void AGolfBall::LeftThumbX(float AxisValue)
 {
-	UE_LOG(LogTemp, Warning, TEXT("right value: %f"), AxisValue);
-	if (AxisValue > 0.1f)
+	//UE_LOG(LogTemp, Warning, TEXT("right value: %f"), AxisValue);
+	if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
 	{
-		leftThumbRight = true;
-		movementSpeedV2.X = AxisValue;
-	}
-	else
-	{
-		leftThumbRight = false;
-		movementSpeedV2.X = AxisValue;
-	}
-		
-	if (AxisValue < -0.1f)
-	{
-		leftThumbLeft = true;
-		movementSpeedV2.X = AxisValue;
-	}
-	else
-	{
-		leftThumbLeft = false;
-		movementSpeedV2.X = AxisValue;
+		if (AxisValue > 0.1f)
+		{
+			leftThumbRight = true;
+			movementSpeedV2.X = AxisValue;
+		}
+		else
+		{
+			leftThumbRight = false;
+			movementSpeedV2.X = AxisValue;
+		}
+
+		if (AxisValue < -0.1f)
+		{
+			leftThumbLeft = true;
+			movementSpeedV2.X = AxisValue;
+		}
+		else
+		{
+			leftThumbLeft = false;
+			movementSpeedV2.X = AxisValue;
+		}
+
+		if (GetWorld()->GetFirstPlayerController()->bShowMouseCursor == true)
+		{
+			int tempX, tempY;
+			GetWorld()->GetFirstPlayerController()->GetViewportSize(tempX, tempY);
+			FMath::Clamp((gamepadMouseLocation.X += AxisValue * 10.f), 0.f, (float)tempX);
+			GetWorld()->GetFirstPlayerController()->SetMouseLocation(gamepadMouseLocation.X, gamepadMouseLocation.Y);
+		}
 	}
 }
 
@@ -1556,6 +1592,7 @@ void AGolfBall::setLMBReleased()
 					strokeCounter++;
 					UGameplayStatics::PlaySound2D(this, golfHitSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.f);
 					Cast<UGolfGameInstance>(GetGameInstance())->gameInstanceStrokeCounter++;
+					canLaunch = false;
 				}
 				else if (!canLaunch)
 				{
@@ -1635,58 +1672,229 @@ void AGolfBall::setLMBReleased()
 
 void AGolfBall::GamepadFaceButtonBottomPressed()
 {
-	if (!bCameraShouldPan)
+	if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
 	{
-		if (state == FLYING)
+
+		if (!bCameraShouldPan)
 		{
-			if (hoverInAir)
+			if (state == FLYING)
 			{
-				hoverInAir = false;
-			}
-
-			if (!hoverInAir)
-			{
-				velocity = FVector::ZeroVector;
-
-				if (!easeGravityShift)
+				if (hoverInAir)
 				{
-					//if (!flyingGravityFlipped)
-					UGameplayStatics::PlaySound2D(this, jumpSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 0.01f);
-					applyForce(FVector(0, 0, 30));
-					//else
-					//applyForce(FVector(0, 0, -30));
-
-					bRestartFlyingAnim = true;
+					hoverInAir = false;
 				}
-				else
-					bRestartFlyingAnim = true;
+
+				if (!hoverInAir)
+				{
+					velocity = FVector::ZeroVector;
+
+					if (!easeGravityShift)
+					{
+						//if (!flyingGravityFlipped)
+						UGameplayStatics::PlaySound2D(this, jumpSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 0.01f);
+						applyForce(FVector(0, 0, 30));
+						//else
+						//applyForce(FVector(0, 0, -30));
+
+						bRestartFlyingAnim = true;
+					}
+					else
+						bRestartFlyingAnim = true;
+				}
+
+			}
+			if (state == WALKING && lineTraceHit && !jumpingNotReady)
+			{
+				jump();
+				jumpingNotReady = true;
 			}
 
-		}
-		if (state == WALKING && lineTraceHit && !jumpingNotReady)
-		{
-			jump();
-			jumpingNotReady = true;
+			if (state == WALKING && !lineTraceHit && coyoteJumpAvailable)
+			{
+				jump();
+				jumpingNotReady = true;
+			}
+
+			if (state == PLINKO && secretLevelManagerInstance->plinkoLaunchReady)
+			{
+				secretLevelManagerInstance->startChargingPlinko();
+			}
 		}
 
-		if (state == WALKING && !lineTraceHit && coyoteJumpAvailable)
+		if (!bCameraShouldPan)
 		{
-			jump();
-			jumpingNotReady = true;
-		}
+			switch (state)
+			{
+			case GOLF:
+				if (canLaunch && PowerBarWidget && !bRespawning)
+				{
+					PowerBarWidget->SetVisibility(ESlateVisibility::Visible);
+					LMBPressed = true;
+					if (ToSpawn && world && UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel03", ESearchCase::IgnoreCase) != 0)
+					{
+						spawnInfo.Owner = this;
+						spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+						dirIndicator = world->SpawnActor<ADirectionIndicator>(ToSpawn, GetActorLocation() +
+							FRotator(0.f, world->GetFirstPlayerController()->GetControlRotation().Yaw, 0.f).Vector() * distanceFromBall,
+							FRotator(0.f, world->GetFirstPlayerController()->GetControlRotation().Yaw, 0.f), spawnInfo);
 
-		if (state == PLINKO && secretLevelManagerInstance->plinkoLaunchReady)
-		{
-			secretLevelManagerInstance->startChargingPlinko();
+						UE_LOG(LogTemp, Warning, TEXT("Spawning direction indicator"));
+					}
+				}
+				break;
+			case WALKING:
+				LMBPressed = true;
+				break;
+			case CLIMBING:
+				LMBPressed = true;
+				if (!mMesh->IsSimulatingPhysics())
+				{
+					mousePositionClicked = FVector(0.f, mouseX, mouseY);
+
+					spawnInfo.Owner = this;
+					spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+					dirIndicator = world->SpawnActor<ADirectionIndicator>(ToSpawn, dirIndicatorLocation, GetActorRotation(), spawnInfo);
+				}
+				break;
+			case FLYING:
+				LMBPressed = true;
+				break;
+			}
 		}
 	}
-
 }
 void AGolfBall::GamepadFaceButtonBottomReleased()
 {
-	if (state == PLINKO)
-		secretLevelManagerInstance->plinkoLaunch();
+	if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+	{
+		if (!bCameraShouldPan)
+		{
+			LMBPressed = false;
+			switch (state)
+			{
+			case GOLF:
+				if (dirIndicator)
+				{
+					indicatorColor = FVector::ZeroVector;
+					indicatorStretch = 0.f;
+					dirIndicator->Destroy();
+				}
+				if (mMesh)
+				{
+					mMesh->SetLinearDamping(0.6);
+					mMesh->SetAngularDamping(0.1);
+				}
+
+				if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel03", ESearchCase::IgnoreCase) != 0
+					&& UGameplayStatics::GetCurrentLevelName(this).Compare("Intro", ESearchCase::IgnoreCase) != 0
+					&& UGameplayStatics::GetCurrentLevelName(this).Compare("Outro", ESearchCase::IgnoreCase) != 0)
+				{
+
+					if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel01", ESearchCase::IgnoreCase) == 0 && !secretLevelManagerInstance->bBallIsThrown)
+					{
+						if (canLaunch)
+						{
+							secretLevelManagerInstance->incrementBowlingThrow();
+							UGameplayStatics::PlaySound2D(this, golfHitSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.f);
+							mMesh->AddImpulse(FRotator(0.f, mController->GetControlRotation().Yaw, 0.f).Vector() * currentLaunchPower * 350.f, NAME_None, false);
+							canLaunch = false;
+						}
+					}
+					/*else if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel01", ESearchCase::IgnoreCase) == 0 && secretLevelManagerInstance->bBallIsThrown)
+					{
+
+					}*/
+					else if (canLaunch)
+					{
+						mMesh->AddImpulse(FRotator(0.f, mController->GetControlRotation().Yaw, 0.f).Vector() * currentLaunchPower * 350.f, NAME_None, false);
+						strokeCounter++;
+						UGameplayStatics::PlaySound2D(this, golfHitSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.f);
+						Cast<UGolfGameInstance>(GetGameInstance())->gameInstanceStrokeCounter++;
+					}
+					else if (!canLaunch)
+					{
+						if (dirIndicator)
+							dirIndicator->Destroy();
+						currentLaunchPower = 0.f;
+					}
+
+				}
+				else if (UGameplayStatics::GetCurrentLevelName(this).Compare("SecretLevel03", ESearchCase::IgnoreCase) == 0)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Ball launched (billiards)"));
+					mMesh->AddImpulse(billiardsLaunchDirection * currentLaunchPower * 350.f, NAME_None, false);
+					if (currentLaunchPower > 100)
+						secretLevelManagerInstance->billiardsShotsUsed++;
+				}
+				currentLaunchPower = 0.f;
+
+				//if (PowerBarWidget)
+				//PowerBarWidget->SetVisibility(ESlateVisibility::Hidden);
+
+				break;
+			case WALKING:
+				break;
+			case CLIMBING:
+				shouldLaunch = true;
+				if (!mMesh->IsSimulatingPhysics())
+				{
+					mousePositionReleased = FVector(0.f, mouseX, mouseY);
+					mousePositionReleased = mousePositionReleased - mousePositionClicked;
+					mousePositionReleased = mousePositionReleased * 2.f;
+					if (mousePositionReleased.Size() < 100.f)
+					{
+						//UE_LOG(LogTemp, Warning, TEXT("%f BELOW MINIMUM SIZE"), mousePositionReleased.Size())
+						shouldLaunch = false;
+						debugMouseLine = FVector::ZeroVector;
+						mousePositionClicked = FVector::ZeroVector;
+						mousePositionReleased = FVector::ZeroVector;
+					}
+					if (mousePositionReleased.Size() > 400.f)
+					{
+						float differenceFactor = mousePositionReleased.Size() / 400.f;
+						mousePositionReleased = mousePositionReleased / differenceFactor;
+						//UE_LOG(LogTemp, Warning, TEXT("%f EXCEEDING MAX SIZE"), mousePositionReleased.Size())
+					}
+					if (shouldLaunch)
+					{
+						if (!currentClimbObject->bIsEdgeNode)
+							mousePositionReleased = mousePositionReleased.RotateAngleAxis(OActorForwardVector.Rotation().Yaw, FVector(0, 0, 1));
+						if (currentClimbObject->bIsEdgeNode && mousePositionClicked.Y >= mouseX)
+							mousePositionReleased = mousePositionReleased.RotateAngleAxis(OActorForwardVector.Rotation().Yaw - 45, FVector(0, 0, 1));
+						if (currentClimbObject->bIsEdgeNode && mousePositionClicked.Y < mouseX)
+							mousePositionReleased = mousePositionReleased.RotateAngleAxis(OActorForwardVector.Rotation().Yaw + 45, FVector(0, 0, 1));
+						if (dirIndicator)
+							dirIndicator->Destroy();
+
+						mMesh->SetSimulatePhysics(true);
+						mMesh->AddImpulse(mousePositionReleased * 2750.f, NAME_None, false);
+						UGameplayStatics::PlaySound2D(this, jumpSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.5f);
+
+						stretchRatio = 0.f;
+						debugMouseLine = FVector::ZeroVector;
+						mousePositionClicked = FVector::ZeroVector;
+						mousePositionReleased = FVector::ZeroVector;
+						bLerpingPerspective = true;
+						bClimbInAir = true;
+						Cast<AClimbObject>(currentClimbObject)->ignored = true;
+
+					}
+					break;
+			case FLYING:
+				break;
+				}
+			}
+		}
+
+		if (state == PLINKO)
+		{
+			UGameplayStatics::PlaySound2D(this, golfHitSound, Cast<UGolfGameInstance>(GetGameInstance())->soundEffectVolume, 1.f);
+			secretLevelManagerInstance->plinkoLaunch();
+		}
+	}
 }
+
+
 void AGolfBall::mouseCameraPitch()
 {
 	if (mouseInputEnabled)
@@ -1731,6 +1939,17 @@ void AGolfBall::RightThumbX(float AxisValue)
 		rightThumbX = AxisValue;
 	else
 		AxisValue = 0;*/
+
+	/*if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+	{
+		if (GetWorld()->GetFirstPlayerController()->bShowMouseCursor == true)
+		{
+			int tempX, tempY;
+			GetWorld()->GetFirstPlayerController()->GetViewportSize(tempX, tempY);
+			FMath::Clamp((gamepadMouseLocation.X += AxisValue * 5.f), 0.f, (float)tempX);
+			GetWorld()->GetFirstPlayerController()->SetMouseLocation(gamepadMouseLocation.X, gamepadMouseLocation.Y);
+		}
+	}*/
 }
 
 void AGolfBall::RightThumbY(float AxisValue)
@@ -1741,6 +1960,16 @@ void AGolfBall::RightThumbY(float AxisValue)
 		rightThumbY = AxisValue;
 	else
 		AxisValue = 0;*/
+	/*if (Cast<UGolfGameInstance>(GetGameInstance())->gamepadConnected)
+	{
+		if (GetWorld()->GetFirstPlayerController()->bShowMouseCursor == true)
+		{
+			int tempX, tempY;
+			GetWorld()->GetFirstPlayerController()->GetViewportSize(tempX, tempY);
+			FMath::Clamp((gamepadMouseLocation.Y += AxisValue * 5.f), 0.f, (float)tempY);
+			GetWorld()->GetFirstPlayerController()->SetMouseLocation(gamepadMouseLocation.X, gamepadMouseLocation.Y);
+		}
+	}*/
 }
 
 void AGolfBall::leftShiftPressed()
