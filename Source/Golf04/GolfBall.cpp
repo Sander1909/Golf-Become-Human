@@ -1976,7 +1976,7 @@ void AGolfBall::leftShiftPressed()
 {
 	
 	//lerpTimer = 0.f;
-	if (!mMesh->IsSimulatingPhysics())
+	/*if (!mMesh->IsSimulatingPhysics())
 		mMesh->SetSimulatePhysics(true);
 
 	else if (state == CLIMBING)
@@ -1995,7 +1995,7 @@ void AGolfBall::leftShiftPressed()
 		golfInit();
 	}
 
-	walkTimer = walkMaxDuration;
+	walkTimer = walkMaxDuration;*/
 }
 
 void AGolfBall::enterPressed()
